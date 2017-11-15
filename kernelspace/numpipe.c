@@ -69,11 +69,11 @@ static ssize_t my_read(struct file *file, char __user *out, size_t size, loff_t 
 	mutex_unlock(&mut);
 	up(&semWriteable);
 	
-	if(copy_to_user(&buff, out, sizeof(buff)))
+	if(copy_to_user(out, &buff, sizeof(buff)))
 	{
 		return -1;
 	}	
-	return 0;
+	return sizeof(buff);
 }
 static ssize_t my_write(struct file *file, char __user *out, size_t size, loff_t *off)
 {
@@ -95,7 +95,7 @@ static ssize_t my_write(struct file *file, char __user *out, size_t size, loff_t
 
 	mutex_unlock(&mut);
 	up(&semReadable);
-	return 0;
+	return sizeof(buff);
 }
 static int my_open(struct inode *inode, struct file *file)
 {
