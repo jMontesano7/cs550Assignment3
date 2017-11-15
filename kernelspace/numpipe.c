@@ -27,12 +27,12 @@ static struct miscdevice my_time = {
 .fops = &my_fops
 };
 
-const int N = 100;
+const int N = 4;
 static DEFINE_SEMAPHORE(semReadable);
 static DEFINE_SEMAPHORE(semWriteable);
 static DEFINE_MUTEX(mut);
-
-
+int  pipeData[4];
+int lastDataSpot = 0;
 int __init init_module()
 {
 	//return -1;  TEST
@@ -45,7 +45,6 @@ int __init init_module()
 		sema_init(&semReadable,0);
 		sema_init(&semWriteable,N);
 		mutex_init(&mut);
-
 		return 0;
 
 	}
@@ -73,8 +72,9 @@ static ssize_t my_write(struct file *file, char __user *out, size_t size, loff_t
 
 	down_interruptible(&semWriteable);
 	mutex_lock_interruptible(&mut);
-	
 
+	pipeData[lastDataSpot]=buff;	
+	lastDataSpot++;
 	mutex_unlock(&mut);
 	up(&semReadable);
 	return 0;
