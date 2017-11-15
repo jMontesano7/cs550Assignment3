@@ -56,6 +56,23 @@ void __exit my_exit(void)
 }
 static ssize_t my_read(struct file *file, char __user *out, size_t size, loff_t *off)
 {
+	down_interruptible(&semReadable);
+	mutex_lock_interruptible(&mut);
+	
+	int buff = pipeData[0];
+	int i = 0;
+	for(i = 0; i < lastDataSpot; i++)
+	{
+		pipeData[i] =pipeData[i+1]; 
+	}
+	lastDataSpot--;
+	mutex_unlock(&mut);
+	up(&semWriteable);
+	
+	if(copy_to_user(&buff, out, sizeof(buff)))
+	{
+		return -1;
+	}	
 	return 0;
 }
 static ssize_t my_write(struct file *file, char __user *out, size_t size, loff_t *off)
@@ -75,6 +92,7 @@ static ssize_t my_write(struct file *file, char __user *out, size_t size, loff_t
 
 	pipeData[lastDataSpot]=buff;	
 	lastDataSpot++;
+
 	mutex_unlock(&mut);
 	up(&semReadable);
 	return 0;
