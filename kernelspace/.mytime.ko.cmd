@@ -1,0 +1,1 @@
+cmd_/home/csvb/git/cs550Assignment3/kernelspace/mytime.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/csvb/git/cs550Assignment3/kernelspace/mytime.ko /home/csvb/git/cs550Assignment3/kernelspace/mytime.o /home/csvb/git/cs550Assignment3/kernelspace/mytime.mod.o
