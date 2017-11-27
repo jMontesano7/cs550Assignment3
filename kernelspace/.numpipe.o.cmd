@@ -655,6 +655,16 @@ deps_/home/csvb/git/cs550Assignment3/kernelspace/numpipe.o := \
   arch/x86/include/asm/smap.h \
     $(wildcard include/config/x86/smap.h) \
   arch/x86/include/asm/uaccess_64.h \
+  include/linux/slab.h \
+    $(wildcard include/config/debug/slab.h) \
+    $(wildcard include/config/failslab.h) \
+    $(wildcard include/config/slab.h) \
+    $(wildcard include/config/slub.h) \
+    $(wildcard include/config/slob.h) \
+  include/linux/kmemleak.h \
+    $(wildcard include/config/debug/kmemleak.h) \
+  include/linux/kasan.h \
+  include/linux/vmalloc.h \
 
 /home/csvb/git/cs550Assignment3/kernelspace/numpipe.o: $(deps_/home/csvb/git/cs550Assignment3/kernelspace/numpipe.o)
 

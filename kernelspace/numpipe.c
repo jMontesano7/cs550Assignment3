@@ -3,6 +3,8 @@
 #include <linux/miscdevice.h>
 #include <linux/fs.h>
 #include <asm/uaccess.h>
+#include <linux/slab.h>
+#include <linux/vmalloc.h>
 
 MODULE_LICENSE("DUAL BSD/GPL");
 
@@ -27,25 +29,37 @@ static struct miscdevice my_time = {
 .fops = &my_fops
 };
 
-const int N = 4;
+static int N = 4;
+module_param(N, int, S_IRUGO);
 static DEFINE_SEMAPHORE(semReadable);
 static DEFINE_SEMAPHORE(semWriteable);
 static DEFINE_MUTEX(mut);
-int  pipeData[4];
+int * pipeData;
 int lastDataSpot = 0;
 int __init init_module()
 {
+	printk(KERN_ALERT "THIS IS WORKING AND READING");
 	//return -1;  TEST
 	if(misc_register(&my_time) != 0)
 	{
+		printk(KERN_ALERT "HEY ISsUE WITH REG");
 		return -1;
 	}
 	else
 	{
+		printk(KERN_ALERT "N = %d ",N);
 		sema_init(&semReadable,0);
 		sema_init(&semWriteable,N);
 		mutex_init(&mut);
+		pipeData = (int*)vmalloc(sizeof(int)*N);
+		if(pipeData == NULL)
+		{
+
+			printk(KERN_ALERT "ISSUE----------------");
+			return -1;
+		}
 		return 0;
+
 
 	}
 }
@@ -53,6 +67,7 @@ int __init init_module()
 void __exit my_exit(void)
 {
 	misc_deregister(&my_time);
+	return 0;
 }
 static ssize_t my_read(struct file *file, char __user *out, size_t size, loff_t *off)
 {
@@ -86,7 +101,10 @@ static ssize_t my_write(struct file *file, char __user *out, size_t size, loff_t
 	}
 
 	//Try to acquire critical section
+	if(lastDataSpot == -1)
+		lastDataSpot = 0;
 
+	printk(KERN_ALERT "WRITING TO : %d",lastDataSpot);
 	down_interruptible(&semWriteable);
 	mutex_lock_interruptible(&mut);
 
@@ -105,3 +123,4 @@ static int my_close(struct inode *inodep, struct file *filp)
 {
 	return 0;
 }
+

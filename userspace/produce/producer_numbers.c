@@ -24,12 +24,10 @@ int main(int argc, char *argv[])
 		exit(1);
 	}	
 
-	printf("HEY");
 	if ( (fd = open(argv[1], O_WRONLY)) < 0) {
 		perror(""); printf("error opening %s\n", argv[1]);
 		exit(1);
 	} 
-	printf("DONE");
 	
 	// Prevent producer from dying due to SIGPIPE when last consumer quits
 	signal(SIGPIPE, SIG_IGN); 
